@@ -89,7 +89,7 @@ contract Real_estate is ERC1155("") {
         address _investor
     ) internal view returns (bool, uint) {
         Property storage getExistingInvestor = properties[_key];
-        for (uint i = 0; i < getExistingInvestor.investorCount; i++) {
+        for (uint i; i < getExistingInvestor.investorCount; i++) {
             if (_investor == properties[_key].investors[i].investor) {
                 return (true, i);
             }
@@ -99,14 +99,14 @@ contract Real_estate is ERC1155("") {
 
     function getReward(uint _key) external {
         (bool success, uint investorId) = checkInvestor(_key, msg.sender);
-        require(success,"Investor not found");
+        require(success, "Investor not found");
         Property storage rewardInfo = properties[_key];
-        Investor memory getInvestor = properties[_key].investors[investorId];
+        Investor storage getInvestor = properties[_key].investors[investorId];
         require(
             rewardInfo.askUSDT == 0,
             "You can get rewards after achieving askUSDT amount"
         );
-        require(getInvestor.timestamp + 30 days >= block.timestamp, "");
+        require(getInvestor.timestamp + 30 days >= block.timestamp, "You can only withdraw after 30 days of your investment");
         getInvestor.timestamp = block.timestamp;
         uint reward = (rewardInfo.addreward * getInvestor.amount) /
             rewardInfo.recievedUSDT;
