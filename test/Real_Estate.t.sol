@@ -27,7 +27,8 @@ contract something is Test {
 
     function testFoo(uint amount) public {
         vm.prank(owner);
-        real_estate.registerProperty(amount, "Ahmedabad");
+        vm.assume(10000 >= amount);
+        real_estate.registerProperty(10000, amount, "Ahmedabad");
         assertEq(
             real_estate.balanceOf(owner, 0),
             amount,
@@ -35,12 +36,20 @@ contract something is Test {
         );
     }
 
+    function testFail_registerProperty(uint amount) public {
+        vm.prank(owner);
+        vm.assume(amount > 10000);
+        real_estate.registerProperty(10000, amount, "Ahmedabad");
+        vm.expectRevert("You can not ask more fund than your property value");
+    }
+
     function test_Investor(uint amount, uint investorAmount) public {
         vm.assume(investorAmount <= 100000);
         vm.assume(amount >= investorAmount);
+        vm.assume(10000 >= amount);
 
         vm.prank(owner);
-        real_estate.registerProperty(amount, "Ahmedabad");
+        real_estate.registerProperty(10000, amount, "Ahmedabad");
 
         vm.startPrank(investor1);
         usdt.approve(address(real_estate), investorAmount);
@@ -68,9 +77,10 @@ contract something is Test {
     }
 
     function test_addreward(uint addreward) public {
+        uint beforeUSDT = usdt.balanceOf(address(real_estate));
         vm.assume(addreward <= 500);
         vm.prank(owner);
-        real_estate.registerProperty(2000, "Ahmedabad");
+        real_estate.registerProperty(10000, 2000, "Ahmedabad");
 
         vm.startPrank(investor1);
         usdt.approve(address(real_estate), 2000);
@@ -90,6 +100,7 @@ contract something is Test {
             "Insufficient Balance to add rewards"
         );
         real_estate.addReward(0, addreward);
+        assertEq(usdt.balanceOf(address(real_estate)) - beforeUSDT, addreward);
         vm.stopPrank();
     }
 
@@ -97,7 +108,7 @@ contract something is Test {
         vm.assume(addreward <= 500);
 
         vm.prank(owner);
-        real_estate.registerProperty(2000, "Ahmedabad");
+        real_estate.registerProperty(10000, 2000, "Ahmedabad");
 
         vm.startPrank(investor1);
         usdt.approve(address(real_estate), 500);
@@ -113,7 +124,7 @@ contract something is Test {
 
     function test_getrewards() public {
         vm.prank(owner);
-        real_estate.registerProperty(2000, "Ahmedabad");
+        real_estate.registerProperty(10000, 2000, "Ahmedabad");
 
         vm.startPrank(investor1);
         usdt.approve(address(real_estate), 2000);
@@ -137,7 +148,7 @@ contract something is Test {
 
     function testFail_getRewallo() public {
         vm.prank(owner);
-        real_estate.registerProperty(2000, "Ahmedabad");
+        real_estate.registerProperty(10000, 2000, "Ahmedabad");
 
         vm.startPrank(investor1);
         usdt.approve(address(real_estate), 500);
@@ -159,7 +170,7 @@ contract something is Test {
 
     function testFail_getRewards() public {
         vm.prank(owner);
-        real_estate.registerProperty(2000, "Ahmedabad");
+        real_estate.registerProperty(10000, 2000, "Ahmedabad");
 
         vm.startPrank(investor1);
         usdt.approve(address(real_estate), 500);

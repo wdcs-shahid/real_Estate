@@ -9,7 +9,7 @@ contract myScript is Script {
     function run() external {
         vm.startBroadcast();
         MyToken usdt = new MyToken();
-        Real_estate real_estate = new Real_estate(address(usdt));
+        new Real_estate(address(usdt));
         vm.stopBroadcast();
     }
 }
