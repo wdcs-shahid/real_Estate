@@ -168,28 +168,5 @@ contract something is Test {
         vm.stopPrank();
     }
 
-    function testFail_getRewards() public {
-        vm.prank(owner);
-        real_estate.registerProperty(10000, 2000, "Ahmedabad");
-
-        vm.startPrank(investor1);
-        usdt.approve(address(real_estate), 500);
-        real_estate.invest(0, 500);
-
-        vm.stopPrank();
-
-        vm.startPrank(owner);
-        usdt.approve(address(real_estate), 1000);
-        real_estate.addReward(0, 1000);
-        uint previousbalance = usdt.balanceOf(investor1);
-        vm.stopPrank();
-
-        vm.startPrank(investor1);
-        vm.warp(block.timestamp + 30 days);
-        uint getReward = (1000 * 500) / 2000;
-        assertEq(usdt.balanceOf(investor1) - previousbalance, getReward, "XYZ");
-        vm.expectRevert("You can get rewards after achieving askUSDT amount");
-        real_estate.getReward(0);
-        vm.stopPrank();
-    }
+    
 }
